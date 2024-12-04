@@ -112,7 +112,6 @@ const ECommerce: React.FC = () => {
         <ChartThree />
         </div>
         <div className="col-span-12 xl:col-span-12">
-          <TableOne />
         </div>
       </div>
     </>
