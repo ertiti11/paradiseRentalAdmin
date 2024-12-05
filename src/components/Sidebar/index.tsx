@@ -7,7 +7,6 @@ import Image from "next/image";
 import SidebarItem from "@/components/Sidebar/SidebarItem";
 import ClickOutside from "@/components/ClickOutside";
 import useLocalStorage from "@/hooks/useLocalStorage";
-import { IoMdBoat } from "react-icons/io";
 
 interface SidebarProps {
   sidebarOpen: boolean;

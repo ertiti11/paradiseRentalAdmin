@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import Modal from "../Modal/page"; // Importar el componente Modal
 import CreateBoatForm from "../CreateBoat/page"; // Importar el formulario de creación
 import axios from 'axios';
+import Image from 'next/image';
 
 interface Barco {
   id: number;
@@ -44,7 +45,7 @@ const BoatCards = () => {
   const toggleDisponible = async (id: number) => {
     const updatedBoats = boats.map((boat) =>
       boat.id === id
-        ? { ...boat, disponible: boat.disponible === 0 ? 1 : 0 }
+        ? { ...boat, disponible: !boat.disponible }
         : boat,
     );
   
@@ -112,9 +113,11 @@ const BoatCards = () => {
             className="rounded-lg hover:scale-110 transition-all border border-stroke bg-white shadow-lg dark:border-strokedark dark:bg-boxdark"
           >
             <div className="relative">
-              <img
+              <Image
                 src={boat.thumbnail}
                 alt={boat.nombre}
+                width={500} // Ajusta el ancho según sea necesario
+                height={300} // Ajusta la altura según sea necesario
                 className="h-40 w-full rounded-t-lg object-cover"
               />
               <button
@@ -243,7 +246,7 @@ const EditBoatForm = ({
               <input
                 type={field.type}
                 name={field.name}
-                value={formData[field.name]}
+                value={formData[field.name as keyof Barco] as string | number}
                 onChange={handleChange}
                 className="mt-1 block w-full rounded border border-gray-300 px-4 py-2 text-sm shadow-sm focus:border-primary focus:ring-primary dark:border-strokedark dark:bg-boxdark dark:text-white"
                 required

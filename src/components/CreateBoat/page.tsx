@@ -17,7 +17,7 @@ interface Barco {
 }
 
 const CreateBoatForm = ({ onSubmit, setIsModalOpen }: { onSubmit: (newBoat: Barco) => void; setIsModalOpen: (isOpen: boolean) => void; }) => {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<Partial<Barco>>({
     nombre: "",
     tipo: "",
     precio_dia: 0,
@@ -84,7 +84,7 @@ const CreateBoatForm = ({ onSubmit, setIsModalOpen }: { onSubmit: (newBoat: Barc
               <input
                 type={field.type}
                 name={field.name}
-                value={formData[field.name]}
+                value={formData[field.name as keyof Barco] as string | number}
                 onChange={handleChange}
                 className="mt-1 block w-full rounded border border-gray-300 px-4 py-2 text-sm shadow-sm focus:border-primary focus:ring-primary dark:border-strokedark dark:bg-boxdark dark:text-white"
                 required
