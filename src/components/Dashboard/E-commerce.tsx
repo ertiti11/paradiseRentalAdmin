@@ -1,6 +1,7 @@
 "use client";
 import dynamic from "next/dynamic";
-import React from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import ChartOne from "../Charts/ChartOne";
 import ChartTwo from "../Charts/ChartTwo";
 import ChatCard from "../Chat/ChatCard";
@@ -16,10 +17,77 @@ const ChartThree = dynamic(() => import("@/components/Charts/ChartThree"), {
 });
 
 const ECommerce: React.FC = () => {
+  const [totalVentas, setTotalViews] = useState<string | null>(null);
+  const [totalGanancias, setTotalGanancias] = useState<string | null>(null);
+  const [totalReservas, setTotalReservas] = useState<string | null>(null);
+  const [clientes, setClientes] = useState<string | null>(null);
+  const [totalClientes, setTotalClientes] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Llamada a la API cuando el componente se monta
+  useEffect(() => {
+    axios
+      .get("http://127.0.0.1:8000/api/v1/dashboard") // Endpoint de la API
+      .then((response) => {
+        // Al recibir la respuesta, guardamos el total_incoming
+        setTotalViews(response.data.total_incoming);
+        setIsLoading(false); // Cambiamos el estado a "no cargando"
+      })
+      .catch((err) => {
+        // Si ocurre un error, lo guardamos en el estado
+        setError("Error al cargar los datos");
+        setIsLoading(false); // También cambiamos el estado de carga
+      });
+  }, []);
+
+  useEffect(() => {
+    axios
+      .get("http://127.0.0.1:8000/api/v1/dashboard")
+      .then((response) => {
+        setTotalGanancias(response.data.total_ganancias);
+        setIsLoading(false);
+      })
+      .catch((err) => {
+        setError("Error al cargar los datos");
+        setIsLoading(false);
+      })
+  })
+
+  useEffect(() => {
+    axios
+      .get("http://127.0.0.1:8000/api/v1/dashboard")
+      .then((response) => {
+        setTotalReservas(response.data.total_reservas);
+        setIsLoading(false);
+      })
+      .catch((err) => {
+        setError("Error al cargar los datos");
+        setIsLoading(false);
+      })
+  })
+
+  useEffect(() => {
+    axios
+      .get("http://127.0.0.1:8000/api/v1/clientes")
+      .then((response) => {
+          setTotalClientes(response.data.data.length); 
+          console.log(totalClientes)
+          // alert("Funciona")
+          setIsLoading(false);
+      })
+
+      .catch((err) => {
+        setError("Error al cargar los datos");
+        setIsLoading(false);
+      })
+  })
+
+
   return (
     <>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-4 2xl:gap-7.5">
-        <CardDataStats title="Total views" total="$3.456K" rate="0.43%" levelUp>
+        <CardDataStats title="Ventas totales" total={isLoading ? "Cargando..." : `${totalVentas || error || "No disponible"}€`} >
           <svg
             className="fill-primary dark:fill-white"
             width="22"
@@ -38,7 +106,7 @@ const ECommerce: React.FC = () => {
             />
           </svg>
         </CardDataStats>
-        <CardDataStats title="Total Profit" total="$45,2K" rate="4.35%" levelUp>
+        <CardDataStats title="Ganancias Totales" total={isLoading ? "Cargando..." : `${totalGanancias || error || "No disponible"}€`} >
           <svg
             className="fill-primary dark:fill-white"
             width="20"
@@ -61,7 +129,7 @@ const ECommerce: React.FC = () => {
             />
           </svg>
         </CardDataStats>
-        <CardDataStats title="Total Product" total="2.450" rate="2.59%" levelUp>
+        <CardDataStats title="Reservas totales" total={isLoading ? "Cargando..." : totalReservas || error || "No disponible"} >
           <svg
             className="fill-primary dark:fill-white"
             width="22"
@@ -80,7 +148,7 @@ const ECommerce: React.FC = () => {
             />
           </svg>
         </CardDataStats>
-        <CardDataStats title="Total Users" total="3.456" rate="0.95%" levelDown>
+        <CardDataStats title="Usuarios Totales" total={isLoading ? "Cargando..." : totalClientes || error || "No disponible"}>
           <svg
             className="fill-primary dark:fill-white"
             width="22"
