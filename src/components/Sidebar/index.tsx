@@ -7,6 +7,7 @@ import Image from "next/image";
 import SidebarItem from "@/components/Sidebar/SidebarItem";
 import ClickOutside from "@/components/ClickOutside";
 import useLocalStorage from "@/hooks/useLocalStorage";
+import { IoMdBoat } from "react-icons/io";
 
 interface SidebarProps {
   sidebarOpen: boolean;
@@ -47,7 +48,7 @@ const menuGroups = [
         ),
         label: "Inicio",
         route: "/",
-        },
+      },
       {
         icon: (
           <svg
@@ -78,6 +79,39 @@ const menuGroups = [
         ),
         label: "Reservas",
         route: "/tables",
+      },
+      {
+        icon: (
+          <svg
+            className="fill-current"
+            width="18"
+            height="19"
+            viewBox="0 0 18 19"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <g clipPath="url(#clip0_130_9756)">
+              <path
+                d="M 1 12 L 17 12 C 17 17 17 18 9 18 C 2 18 1 17 1 12 M 9 12 V 2 L 16 10 L 9 10"
+                stroke="white"
+                strokeWidth="1"
+                fill="none"
+              />
+            </g>
+            <defs>
+              <clipPath id="clip0_130_9756">
+                <rect
+                  width="18"
+                  height="18"
+                  fill="white"
+                  transform="translate(0 0.052124)"
+                />
+              </clipPath>
+            </defs>
+          </svg>
+        ),
+        label: "Barcos",
+        route: "/boats",
       },
       {
         icon: (
