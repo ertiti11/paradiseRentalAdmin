@@ -21,7 +21,7 @@ const CreateReservaForm = () => {
   
       try {
         // Enviar la solicitud POST a la API
-        const response = await axios.post('http://localhost:8000/api/v1/reservas', formData, {
+        const response = await axios.post(`${process.env.API_URL}/reservas`, formData, {
           headers: {
             'Content-Type': 'application/json',
           }

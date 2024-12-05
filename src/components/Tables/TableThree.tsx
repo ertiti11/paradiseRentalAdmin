@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import Modal from "../Modal/page.tsx"; // Importar el componente Modal
 import axios from 'axios';
+import '@/envConfig.ts'
 
 interface Reserva {
   id: number;
@@ -38,7 +39,7 @@ const ReservaCards = () => {
   useEffect(() => {
     const fetchReservas = async () => {
       try {
-        const response = await fetch("http://localhost:8000/api/v1/reservas");
+        const response = await fetch(`${process.env.API_URL}/reservas`);
         const data = await response.json();
         setReservas(data);
         setLoading(false);
@@ -69,7 +70,7 @@ const ReservaCards = () => {
   const handleDelete = async (id: number) => {
     try {
       // Eliminar la reserva de la base de datos a través de la API
-      await axios.delete(`http://localhost:8000/api/v1/reservas/${id}`);
+      await axios.delete(`${process.env.API_URL}/reservas/${id}`);
       
       // Eliminar la reserva de la lista localmente (sin necesidad de recargar la lista completa)
       setReservas((prevReservas) => prevReservas.filter((reserva) => reserva.id !== id));
@@ -175,7 +176,7 @@ const EditReservaForm = ({
     console.log("Form data:", formData);
   
     try {
-      const response = await axios.put(`http://localhost:8000/api/v1/reservas/${reserva.id}`, formData);
+      const response = await axios.put(`${process.env.API_URL}/reservas/${reserva.id}`, formData);
       console.log("Response:", response.data);
     } catch (error) {
       console.error("Error updating reserva:", error);
@@ -245,7 +246,7 @@ const CreateReservaForm = () => {
     e.preventDefault();
 
     try {
-      const response = await axios.post('http://localhost:8000/api/v1/reservas', formData);
+      const response = await axios.post(`${process.env.API_URL}/reservas`, formData);
       console.log("Reserva creada:", response.data);
     } catch (error) {
       console.error("Error creando reserva:", error);
