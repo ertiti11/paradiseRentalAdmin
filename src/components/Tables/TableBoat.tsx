@@ -1,19 +1,22 @@
 "use client";
 import { useEffect, useState } from "react";
-import Modal from "../Modal/page.tsx"; // Importar el componente Modal
-import CreateBoatForm from "../CreateBoat/page.tsx"; // Importar el formulario de creación
+import Modal from "../Modal/page"; // Importar el componente Modal
+import CreateBoatForm from "../CreateBoat/page"; // Importar el formulario de creación
 import axios from 'axios';
-import { preconnect } from "next/dist/server/app-render/entry-base";
 
 interface Barco {
   id: number;
   nombre: string;
+  tipo: string;
   precio_dia: number;
   capacidad: number;
   longitud: number;
   localizacion: string;
-  disponible: number;
+  disponible: boolean;
   thumbnail: string;
+  descripcion: string;
+  reserva_id: number | null;
+  categoria_id: number;
 }
 
 const BoatCards = () => {
@@ -78,6 +81,11 @@ const BoatCards = () => {
 
   const handleDeleteBoat = (id: number) => {
     setBoats((prevBoats) => prevBoats.filter((boat) => boat.id !== id));
+  };
+
+  const handleCreateSubmit = (newBoat: Barco) => {
+    setBoats((prevBoats) => [...prevBoats, newBoat]);
+    setIsModalOpen(false);
   };
 
   if (loading) {
@@ -147,8 +155,9 @@ const BoatCards = () => {
           {selectedBoat ? "Editar Barco" : "Crear Nuevo Barco"}
         </h2>
         {selectedBoat ? (
-          <EditBoatForm boat={selectedBoat} onSubmit={handleEditSubmit} onDelete={handleDeleteBoat} setIsModalOpen={setIsModalOpen} />        ) : (
-          <CreateBoatForm />
+          <EditBoatForm boat={selectedBoat} onSubmit={handleEditSubmit} onDelete={handleDeleteBoat} setIsModalOpen={setIsModalOpen} />
+        ) : (
+          <CreateBoatForm onSubmit={handleCreateSubmit} setIsModalOpen={setIsModalOpen} />
         )}
       </Modal>
     </div>
@@ -259,6 +268,5 @@ const EditBoatForm = ({
     </div>
   );
 };
-
 
 export default BoatCards;

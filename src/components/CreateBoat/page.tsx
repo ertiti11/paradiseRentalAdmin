@@ -1,86 +1,84 @@
-"use client";
 import { useState } from "react";
+import axios from 'axios';
 
-const CreateBoatForm = () => {
+interface Barco {
+  id: number;
+  nombre: string;
+  tipo: string;
+  precio_dia: number;
+  capacidad: number;
+  longitud: number;
+  localizacion: string;
+  disponible: boolean;
+  thumbnail: string;
+  descripcion: string;
+  reserva_id: number | null;
+  categoria_id: number;
+}
+
+const CreateBoatForm = ({ onSubmit, setIsModalOpen }: { onSubmit: (newBoat: Barco) => void; setIsModalOpen: (isOpen: boolean) => void; }) => {
   const [formData, setFormData] = useState({
     nombre: "",
     tipo: "",
-    precio_dia: "",
-    capacidad: "",
+    precio_dia: 0,
+    capacidad: 0,
+    longitud: 0,
+    localizacion: "",
+    disponible: true,
     thumbnail: "",
     descripcion: "",
-    longitud: "",
-    localizacion: "",
-    disponible: "1",
-    reserva_id: "",
-    categoria_id: "",
-    fotos: [""],
+    reserva_id: null,
+    categoria_id: 1,
   });
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData((prevFormData) => {
-      if (name.startsWith("foto_")) {
-        const index = parseInt(name.split("_")[1]);
-        const updatedFotos = [...prevFormData.fotos];
-        updatedFotos[index] = value;
-        return { ...prevFormData, fotos: updatedFotos };
-      }
-      return { ...prevFormData, [name]: value };
-    });
+    setFormData({ ...formData, [name]: value });
   };
 
-  const addPhotoField = () => {
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      fotos: [...prevFormData.fotos, ""],
-    }));
-  };
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Datos del barco:", formData);
-    // Lógica de envío a API
-    setFormData({
-      nombre: "",
-      tipo: "",
-      precio_dia: "",
-      capacidad: "",
-      thumbnail: "",
-      descripcion: "",
-      longitud: "",
-      localizacion: "",
-      disponible: "1",
-      reserva_id: "",
-      categoria_id: "",
-      fotos: [""],
-    });
+    console.log("Form data:", formData);
+
+    // Validar que longitud sea un entero
+    if (!Number.isInteger(Number(formData.longitud))) {
+      alert("La longitud debe ser un número entero.");
+      return;
+    }
+
+    try {
+      const response = await axios.post(`${process.env.API_URL}/barcos`, formData);
+      console.log("Response:", response.data);
+      onSubmit(response.data);
+      setIsModalOpen(false); // Cerrar el modal
+    } catch (error) {
+      console.error("Error creating boat:", error);
+    }
   };
 
   return (
     <div className="rounded-sm border border-stroke bg-white px-5 py-4 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5">
       <h2 className="mb-4 text-base font-semibold text-black dark:text-white">
-        Crear Barco
+        Crear Nuevo Barco
       </h2>
       <div
         className="max-h-96 overflow-y-auto"
         style={{ scrollbarWidth: "thin", scrollbarColor: "#ccc transparent" }}
       >
-        <form onSubmit={handleSubmit} className="space-y-3">
+        <form onSubmit={handleSubmit} className="space-y-4">
           {[
             { label: "Nombre", name: "nombre", type: "text" },
             { label: "Tipo", name: "tipo", type: "text" },
-            { label: "Precio Día (€)", name: "precio_dia", type: "number" },
+            { label: "Precio/día", name: "precio_dia", type: "number" },
             { label: "Capacidad", name: "capacidad", type: "number" },
+            { label: "Longitud", name: "longitud", type: "number" },
+            { label: "Localización", name: "localizacion", type: "text" },
             { label: "Thumbnail", name: "thumbnail", type: "text" },
             { label: "Descripción", name: "descripcion", type: "text" },
-            { label: "Longitud (m)", name: "longitud", type: "number" },
-            { label: "Localización", name: "localizacion", type: "text" },
-            { label: "Reserva ID", name: "reserva_id", type: "text" },
-            { label: "Categoría ID", name: "categoria_id", type: "text" },
+            { label: "Categoría ID", name: "categoria_id", type: "number" },
           ].map((field) => (
             <div key={field.name}>
-              <label className="block text-xs font-medium text-black dark:text-white">
+              <label className="block text-sm font-medium text-black dark:text-black">
                 {field.label}
               </label>
               <input
@@ -88,49 +86,14 @@ const CreateBoatForm = () => {
                 name={field.name}
                 value={formData[field.name]}
                 onChange={handleChange}
-                className="mt-1 block w-full rounded border border-gray-300 px-2 py-1 text-xs focus:border-primary focus:ring-primary dark:border-strokedark dark:bg-boxdark dark:text-white"
-                required={field.name !== "reserva_id"}
+                className="mt-1 block w-full rounded border border-gray-300 px-4 py-2 text-sm shadow-sm focus:border-primary focus:ring-primary dark:border-strokedark dark:bg-boxdark dark:text-white"
+                required
               />
             </div>
           ))}
-          <div>
-            <label className="block text-xs font-medium text-black dark:text-white">
-              ¿Disponible?
-            </label>
-            <select
-              name="disponible"
-              value={formData.disponible}
-              onChange={handleChange}
-              className="mt-1 block w-full rounded border border-gray-300 px-2 py-1 text-xs focus:border-primary focus:ring-primary dark:border-strokedark dark:bg-boxdark dark:text-white"
-            >
-              <option value="1">Sí</option>
-              <option value="0">No</option>
-            </select>
-          </div>
-          {formData.fotos.map((foto, index) => (
-            <div key={index}>
-              <label className="block text-xs font-medium text-black dark:text-white">
-                Foto {index + 1} (URL)
-              </label>
-              <input
-                type="text"
-                name={`foto_${index}`}
-                value={foto}
-                onChange={handleChange}
-                className="mt-1 block w-full rounded border border-gray-300 px-2 py-1 text-xs focus:border-primary focus:ring-primary dark:border-strokedark dark:bg-boxdark dark:text-white"
-              />
-            </div>
-          ))}
-          <button
-            type="button"
-            onClick={addPhotoField}
-            className="hover:bg-secondary-dark mt-2 w-full rounded bg-secondary px-2 py-1 text-xs font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2"
-          >
-            Añadir Foto
-          </button>
           <button
             type="submit"
-            className="hover:bg-primary-dark w-full rounded bg-primary px-3 py-1 text-xs font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+            className="hover:bg-primary-dark w-full rounded bg-primary px-4 py-2 text-sm font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
           >
             Crear Barco
           </button>
