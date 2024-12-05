@@ -25,13 +25,32 @@ const ECommerce: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
+  const formatNumber = (num: number | string | null) => {
+    if (num === null || num === undefined) return null;
+  
+    // Convertir a número si la entrada es una cadena
+    const parsed = typeof num === "string" ? parseFloat(num) : num;
+  
+    // Verificar si es un número válido
+    if (isNaN(parsed)) return num; // Si no es válido, devolver la entrada original
+  
+    // Formatear al estilo europeo
+    return parsed.toLocaleString("de-DE", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+  };
+  
+  
+  
+
   // Llamada a la API cuando el componente se monta
   useEffect(() => {
     axios
       .get("http://127.0.0.1:8000/api/v1/dashboard") // Endpoint de la API
       .then((response) => {
         // Al recibir la respuesta, guardamos el total_incoming
-        setTotalViews(response.data.total_incoming);
+        setTotalViews(formatNumber(response.data.total_incoming));
         setIsLoading(false); // Cambiamos el estado a "no cargando"
       })
       .catch((err) => {
@@ -45,7 +64,7 @@ const ECommerce: React.FC = () => {
     axios
       .get("http://127.0.0.1:8000/api/v1/dashboard")
       .then((response) => {
-        setTotalGanancias(response.data.total_ganancias);
+        setTotalGanancias(formatNumber(response.data.total_ganancias));
         setIsLoading(false);
       })
       .catch((err) => {
