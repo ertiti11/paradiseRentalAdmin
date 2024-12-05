@@ -37,14 +37,27 @@ const BoatCards = () => {
     fetchBoats();
   }, []);
 
-  const toggleDisponible = (id: number) => {
-    setBoats((prevBoats) =>
-      prevBoats.map((boat) =>
-        boat.id === id
-          ? { ...boat, disponible: boat.disponible === 0 ? 1 : 0 }
-          : boat,
-      ),
+  const toggleDisponible = async (id: number) => {
+    const updatedBoats = boats.map((boat) =>
+      boat.id === id
+        ? { ...boat, disponible: boat.disponible === 0 ? 1 : 0 }
+        : boat,
     );
+  
+    const updatedBoat = updatedBoats.find((boat) => boat.id === id);
+  
+    if (updatedBoat) {
+      try {
+        const response = await axios.put(`http://localhost:8000/api/v1/barcos/${id}`, {
+          disponible: updatedBoat.disponible
+        });
+        console.log(updatedBoat.disponible)
+        console.log("Response:", response.data);
+        setBoats(updatedBoats);
+      } catch (error) {
+        console.error("Error updating boat:", error);
+      }
+    }
   };
 
   const openEditModal = (boat: Barco) => {
@@ -62,12 +75,16 @@ const BoatCards = () => {
     setSelectedBoat(null);
   };
 
+  const handleDeleteBoat = (id: number) => {
+    setBoats((prevBoats) => prevBoats.filter((boat) => boat.id !== id));
+  };
+
   if (loading) {
     return <div>Cargando barcos...</div>;
   }
 
   return (
-    <div>
+    <div className="">
       <div className="mb-6 flex justify-end">
         <button
           onClick={() => {
@@ -83,7 +100,7 @@ const BoatCards = () => {
         {boats.map((boat) => (
           <div
             key={boat.id}
-            className="rounded-lg border border-stroke bg-white shadow-lg dark:border-strokedark dark:bg-boxdark"
+            className="rounded-lg hover:scale-110 transition-all border border-stroke bg-white shadow-lg dark:border-strokedark dark:bg-boxdark"
           >
             <div className="relative">
               <img
@@ -93,9 +110,8 @@ const BoatCards = () => {
               />
               <button
                 onClick={() => toggleDisponible(boat.id)}
-                className={`absolute right-2 top-2 rounded-full px-3 py-1 text-sm font-medium text-white ${
-                  boat.disponible ? "bg-green-500" : "bg-red-500"
-                }`}
+                className={`absolute right-2 top-2 rounded-full px-3 py-1 text-sm font-medium text-white ${boat.disponible ? "bg-green-500" : "bg-red-500"
+                  }`}
               >
                 {boat.disponible ? "Disponible" : "No disponible"}
               </button>
@@ -130,8 +146,7 @@ const BoatCards = () => {
           {selectedBoat ? "Editar Barco" : "Crear Nuevo Barco"}
         </h2>
         {selectedBoat ? (
-          <EditBoatForm boat={selectedBoat} onSubmit={handleEditSubmit} />
-        ) : (
+          <EditBoatForm boat={selectedBoat} onSubmit={handleEditSubmit} onDelete={handleDeleteBoat} setIsModalOpen={setIsModalOpen} />        ) : (
           <CreateBoatForm />
         )}
       </Modal>
@@ -142,9 +157,13 @@ const BoatCards = () => {
 const EditBoatForm = ({
   boat,
   onSubmit,
+  onDelete,
+  setIsModalOpen,
 }: {
   boat: Barco;
   onSubmit: (updatedBoat: Barco) => void;
+  onDelete: (id: number) => void;
+  setIsModalOpen: (isOpen: boolean) => void;
 }) => {
   const [formData, setFormData] = useState({ ...boat });
 
@@ -153,17 +172,37 @@ const EditBoatForm = ({
     setFormData({ ...formData, [name]: value });
   };
 
+  const BorrarBarco = async (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log("boat id:", boat.id);
+
+    try {
+      const response = await axios.delete(`http://localhost:8000/api/v1/barcos/${boat.id}`);
+      console.log("Response:", response.data);
+      onDelete(boat.id);
+      setIsModalOpen(false); // Cerrar el modal
+    } catch (error) {
+      console.error("Error deleting boat:", error);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Form data:", formData);
-  
+
+    // Validar que longitud sea un entero
+    if (!Number.isInteger(Number(formData.longitud))) {
+      alert("La longitud debe ser un número entero.");
+      return;
+    }
+
     try {
       const response = await axios.put(`http://localhost:8000/api/v1/barcos/${boat.id}`, formData);
       console.log("Response:", response.data);
     } catch (error) {
       console.error("Error updating boat:", error);
     }
-  
+
     onSubmit(formData as Barco);
   };
 
@@ -207,10 +246,18 @@ const EditBoatForm = ({
           >
             Guardar Cambios
           </button>
+          <button
+            type="button"
+            onClick={BorrarBarco}
+            className="hover:bg-red-700 w-full rounded bg-red-600 px-4 py-2 text-sm font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+          >
+            Borrar barco
+          </button>
         </form>
       </div>
     </div>
   );
 };
+
 
 export default BoatCards;
