@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import Modal from "../Modal/page.tsx"; // Importar el componente Modal
 import CreateBoatForm from "../CreateBoat/page.tsx"; // Importar el formulario de creación
+import axios from 'axios';
 
 interface Barco {
   id: number;
@@ -152,8 +153,17 @@ const EditBoatForm = ({
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("Form data:", formData);
+  
+    try {
+      const response = await axios.put(`http://localhost:8000/api/v1/barcos/${boat.id}`, formData);
+      console.log("Response:", response.data);
+    } catch (error) {
+      console.error("Error updating boat:", error);
+    }
+  
     onSubmit(formData as Barco);
   };
 
