@@ -1,5 +1,5 @@
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
-import TableBoat from "../../components/Tables/TableBoat.tsx";
+import TableBoat from "../../components/Tables/TableBoat";
 
 import { Metadata } from "next";
 import DefaultLayout from "@/components/Layouts/DefaultLayout";
