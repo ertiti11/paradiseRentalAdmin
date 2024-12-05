@@ -1,8 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
-import Modal from "../Modal/page.tsx"; // Importar el componente Modal
+import Modal from "../Modal/page"; // Importar el componente Modal
 import axios from 'axios';
-import '@/envConfig.ts'
+
 
 interface Reserva {
   id: number;

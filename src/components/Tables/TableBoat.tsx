@@ -4,7 +4,6 @@ import Modal from "../Modal/page.tsx"; // Importar el componente Modal
 import CreateBoatForm from "../CreateBoat/page.tsx"; // Importar el formulario de creación
 import axios from 'axios';
 import { preconnect } from "next/dist/server/app-render/entry-base";
-import '@/envConfig.ts'
 
 interface Barco {
   id: number;
