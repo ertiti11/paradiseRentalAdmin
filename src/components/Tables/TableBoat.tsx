@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import Modal from "../Modal/page.tsx"; // Importar el componente Modal
 import CreateBoatForm from "../CreateBoat/page.tsx"; // Importar el formulario de creación
 import axios from 'axios';
+import { preconnect } from "next/dist/server/app-render/entry-base";
+import '@/envConfig.ts'
 
 interface Barco {
   id: number;
@@ -24,7 +26,7 @@ const BoatCards = () => {
   useEffect(() => {
     const fetchBoats = async () => {
       try {
-        const response = await fetch("http://localhost:8000/api/v1/barcos");
+        const response = await fetch(`${process.env.API_URL}/barcos`);
         const data = await response.json();
         setBoats(data);
         setLoading(false);
@@ -48,7 +50,7 @@ const BoatCards = () => {
   
     if (updatedBoat) {
       try {
-        const response = await axios.put(`http://localhost:8000/api/v1/barcos/${id}`, {
+        const response = await axios.put(`${process.env.API_URL}/barcos/${id}`, {
           disponible: updatedBoat.disponible
         });
         console.log(updatedBoat.disponible)
@@ -177,7 +179,7 @@ const EditBoatForm = ({
     console.log("boat id:", boat.id);
 
     try {
-      const response = await axios.delete(`http://localhost:8000/api/v1/barcos/${boat.id}`);
+      const response = await axios.delete(`${process.env.API_URL}/barcos/${boat.id}`);
       console.log("Response:", response.data);
       onDelete(boat.id);
       setIsModalOpen(false); // Cerrar el modal
@@ -197,7 +199,7 @@ const EditBoatForm = ({
     }
 
     try {
-      const response = await axios.put(`http://localhost:8000/api/v1/barcos/${boat.id}`, formData);
+      const response = await axios.put(`${process.env.API_URL}/barcos/${boat.id}`, formData);
       console.log("Response:", response.data);
     } catch (error) {
       console.error("Error updating boat:", error);
